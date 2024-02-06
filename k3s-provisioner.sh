@@ -7,4 +7,4 @@ chmod 0600 /etc/rancher/k3s/install.env
 set -o allexport
 source /etc/rancher/k3s/install.env
 set +o allexport
-curl -fsL 'https://get.k3s.io' |  sh -s -  "agent"
+curl -fsL 'https://get.k3s.io' |  sh -s -  

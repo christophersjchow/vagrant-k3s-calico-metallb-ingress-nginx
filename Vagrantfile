@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
     node.vm.hostname = node_1_name
     node.vm.network :public_network, ip: master_ip_address, bridge: 'en12'
 
-    node.vm.provision :shell, path: 'install-packages.sh'
+    node.vm.provision :shell, path: 'bootstrap-node.sh'
     node.vm.provision :k3s do |k3s|
       k3s.env = [
         'INSTALL_K3S_CHANNEL=stable',
@@ -30,12 +30,14 @@ Vagrant.configure("2") do |config|
       ]
       k3s.skip_start = false
       k3s.config = {
-        :disable => %w[local-storage servicelb traefik],
+        :disable => %w[servicelb traefik],
         'disable-network-policy' => true,
         'flannel-backend' => 'none',
       }
       k3s.config_mode = '0644' # side-step https://github.com/k3s-io/k3s/issues/4321
     end
+
+    node.vm.provision :shell, path: 'setup-networking.sh'
   end
 
   (2..3).each do |i|
@@ -48,7 +50,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = node_name
       node.vm.network :public_network, ip: ip_address, bridge: 'en12'
 
-      node.vm.provision :shell, path: 'install-packages.sh'
+      node.vm.provision :shell, path: 'bootstrap-node.sh'
       node.vm.provision :k3s, run: "once" do |k3s|
         k3s.env = [
           'INSTALL_K3S_CHANNEL=stable',
